@@ -27,6 +27,10 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       defaultValue: 0, // 기본값 설정
     },
+    type: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+    },
   });
   return product;
 };

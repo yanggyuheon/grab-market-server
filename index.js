@@ -14,6 +14,7 @@ const upload = multer({
     },
   }),
 });
+const detectProduct = require("./helpers/detectProduct");
 const port = process.env.PORT || 8080; // heroku에서 다른 포트번호 사용시 그 번호를 사용하도록
 
 app.use(express.json()); // json 형식 데이터 처리할 수 있도록
@@ -74,24 +75,27 @@ app.post("/products", (req, res) => {
     res.status(400).send("모든 필드를 작성해주세요");
   }
 
-  // Product 테이블에 객체 넣어주기, 비동기 처리
-  models.Product.create({
-    name, // name: name 과 같이 같으면 그냥 name으로 작성 가능
-    price,
-    seller,
-    description,
-    imageUrl,
-  })
-    .then((result) => {
-      console.log("상품 생성 결과 :", result);
-      res.send({
-        result,
-      });
+  detectProduct(imageUrl, (type) => {
+    // Product 테이블에 객체 넣어주기, 비동기 처리
+    models.Product.create({
+      name, // name: name 과 같이 같으면 그냥 name으로 작성 가능
+      price,
+      seller,
+      description,
+      imageUrl,
+      type,
     })
-    .catch((error) => {
-      console.error(error);
-      res.status(400).send("상품 업로드에 문제가 발생했습니다.");
-    });
+      .then((result) => {
+        console.log("상품 생성 결과 :", result);
+        res.send({
+          result,
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(400).send("상품 업로드에 문제가 발생했습니다.");
+      });
+  });
 });
 
 app.get("/products/:id", (req, res) => {
